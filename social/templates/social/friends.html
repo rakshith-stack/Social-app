@@ -1,0 +1,39 @@
+{% extends "social/base.html" %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>Find Friends</h1>
+
+    <p>Here you can find other users.</p>
+
+</div>
+
+{% for person in users %}
+
+<div class="card">
+
+    <h2>{{ person.username }}</h2>
+
+    <p>User ID: {{ person.id }}</p>
+
+    <a href="{% url 'send_friend_request' person.id %}">
+        <button>Add Friend</button>
+    </a>
+
+</div>
+
+{% empty %}
+
+<div class="card">
+
+    <h3>No other users found.</h3>
+
+    <p>Create another account to test the friend request feature.</p>
+
+</div>
+
+{% endfor %}
+
+{% endblock %}

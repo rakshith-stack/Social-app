@@ -1,0 +1,43 @@
+{% extends "social/base.html" %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>Friend Requests</h1>
+
+    <br>
+
+    {% for friend_request in requests %}
+
+        <div class="card">
+
+            <h3>
+                {{ friend_request.sender.username }}
+            </h3>
+
+            <p>
+                wants to be your friend.
+            </p>
+
+            <br>
+
+            <a href="{% url 'accept_request' friend_request.id %}">
+                <button>
+                    Accept
+                </button>
+            </a>
+
+        </div>
+
+    {% empty %}
+
+        <p>
+            You don't have any friend requests.
+        </p>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

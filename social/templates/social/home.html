@@ -1,0 +1,73 @@
+{% extends "social/base.html" %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>Welcome, {{ user.username }} 👋</h1>
+
+    <br>
+
+    <h2>Create a Post</h2>
+
+    <br>
+
+    <form method="POST" action="{% url 'create_post' %}">
+
+        {% csrf_token %}
+
+        <textarea
+            name="content"
+            placeholder="What's on your mind?"
+            rows="4"
+            required
+        ></textarea>
+
+        <br><br>
+
+        <button type="submit">
+            Post
+        </button>
+
+    </form>
+
+</div>
+
+
+<div class="card">
+
+    <h2>Your Friends' Feed</h2>
+
+    <br>
+
+    {% for post in posts %}
+
+        <div class="card">
+
+            <h3>
+                {{ post.user.username }}
+            </h3>
+
+            <small>
+                {{ post.created_at }}
+            </small>
+
+            <br><br>
+
+            <p>
+                {{ post.content }}
+            </p>
+
+        </div>
+
+    {% empty %}
+
+        <p>
+            No posts from your friends yet.
+        </p>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
