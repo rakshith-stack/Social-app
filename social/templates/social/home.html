@@ -2,6 +2,8 @@
 
 {% block content %}
 
+<!-- CREATE POST -->
+
 <div class="card">
 
     <h1>Welcome, {{ user.username }} 👋</h1>
@@ -12,7 +14,11 @@
 
     <br>
 
-    <form method="POST" action="{% url 'create_post' %}">
+    <form
+        method="POST"
+        action="{% url 'create_post' %}"
+        enctype="multipart/form-data"
+    >
 
         {% csrf_token %}
 
@@ -20,8 +26,45 @@
             name="content"
             placeholder="What's on your mind?"
             rows="4"
-            required
         ></textarea>
+
+        <br><br>
+
+        <!-- PHOTO -->
+
+        <label
+            for="image-upload"
+            style="cursor: pointer;"
+        >
+            📷 <strong>Photo</strong>
+        </label>
+
+        <input
+            type="file"
+            id="image-upload"
+            name="image"
+            accept="image/*"
+            style="display: none;"
+        >
+
+        &nbsp;&nbsp;&nbsp;
+
+        <!-- VIDEO -->
+
+        <label
+            for="video-upload"
+            style="cursor: pointer;"
+        >
+            🎥 <strong>Video</strong>
+        </label>
+
+        <input
+            type="file"
+            id="video-upload"
+            name="video"
+            accept="video/*"
+            style="display: none;"
+        >
 
         <br><br>
 
@@ -34,9 +77,11 @@
 </div>
 
 
+<!-- FEED -->
+
 <div class="card">
 
-    <h2>Your Friends' Feed</h2>
+    <h2>Your Feed</h2>
 
     <br>
 
@@ -44,9 +89,13 @@
 
         <div class="card">
 
+            <!-- USERNAME -->
+
             <h3>
                 {{ post.user.username }}
             </h3>
+
+            <!-- DATE -->
 
             <small>
                 {{ post.created_at }}
@@ -54,16 +103,84 @@
 
             <br><br>
 
-            <p>
-                {{ post.content }}
-            </p>
+
+            <!-- TEXT -->
+
+            {% if post.content %}
+
+                <p>
+                    {{ post.content }}
+                </p>
+
+            {% endif %}
+
+
+            <!-- PHOTO -->
+
+            {% if post.image %}
+
+                <br>
+
+                <img
+                    src="{{ post.image.url }}"
+                    alt="Post image"
+                    width="400"
+                    style="max-width: 100%; height: auto;"
+                >
+
+            {% endif %}
+
+
+            <!-- VIDEO -->
+
+            {% if post.video %}
+
+                <br>
+
+                <video
+                    width="500"
+                    controls
+                    style="max-width: 100%;"
+                >
+
+                    <source
+                        src="{{ post.video.url }}"
+                        type="video/mp4"
+                    >
+
+                    Your browser does not support video.
+
+                </video>
+
+            {% endif %}
+
+
+            <!-- EDIT AND DELETE -->
+
+            {% if post.user == user %}
+
+                <br><br>
+
+                <a href="{% url 'edit_post' post.id %}">
+                    <button>
+                        Edit Post
+                    </button>
+                </a>
+
+                <a href="{% url 'delete_post' post.id %}">
+                    <button>
+                        Delete Post
+                    </button>
+                </a>
+
+            {% endif %}
 
         </div>
 
     {% empty %}
 
         <p>
-            No posts from your friends yet.
+            No posts from you or your friends yet.
         </p>
 
     {% endfor %}

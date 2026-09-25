@@ -1,0 +1,121 @@
+{% extends "social/base.html" %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>Edit Post ✏️</h1>
+
+    <br>
+
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+    >
+
+        {% csrf_token %}
+
+        <textarea
+            name="content"
+            rows="5"
+            placeholder="What's on your mind?"
+        >{{ post.content }}</textarea>
+
+        <br><br>
+
+
+        <!-- CURRENT IMAGE -->
+
+        {% if post.image %}
+
+            <p><strong>Current Photo:</strong></p>
+
+            <img
+                src="{{ post.image.url }}"
+                alt="Current post image"
+                width="300"
+                style="max-width: 100%; height: auto;"
+            >
+
+            <br><br>
+
+        {% endif %}
+
+
+        <!-- NEW IMAGE -->
+
+        <label>
+            📷 <strong>Change Photo</strong>
+        </label>
+
+        <br><br>
+
+        <input
+            type="file"
+            name="image"
+            accept="image/*"
+        >
+
+        <br><br>
+
+
+        <!-- CURRENT VIDEO -->
+
+        {% if post.video %}
+
+            <p><strong>Current Video:</strong></p>
+
+            <video
+                width="400"
+                controls
+                style="max-width: 100%;"
+            >
+
+                <source
+                    src="{{ post.video.url }}"
+                    type="video/mp4"
+                >
+
+                Your browser does not support video.
+
+            </video>
+
+            <br><br>
+
+        {% endif %}
+
+
+        <!-- NEW VIDEO -->
+
+        <label>
+            🎥 <strong>Change Video</strong>
+        </label>
+
+        <br><br>
+
+        <input
+            type="file"
+            name="video"
+            accept="video/*"
+        >
+
+        <br><br>
+
+
+        <button type="submit">
+            Save Changes
+        </button>
+
+        &nbsp;
+
+        <a href="{% url 'home' %}">
+            <button type="button">
+                Cancel
+            </button>
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}

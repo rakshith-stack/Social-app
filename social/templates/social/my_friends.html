@@ -1,0 +1,24 @@
+{% extends "social/base.html" %}
+
+{% block content %}
+
+<div class="card">
+    <h1>My Friends 👥</h1>
+
+    <br>
+
+    {% for friend in friends %}
+
+        <div class="card">
+            <h2>{{ friend.username }}</h2>
+            <p>You are friends with {{ friend.username }}.</p>
+        </div>
+
+    {% empty %}
+
+        <p>You don't have any friends yet.</p>
+
+    {% endfor %}
+</div>
+
+{% endblock %}

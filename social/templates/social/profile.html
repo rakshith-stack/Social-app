@@ -1,0 +1,167 @@
+{% extends "social/base.html" %}
+
+{% block content %}
+
+<!-- PROFILE DETAILS -->
+
+<div class="card">
+
+    <h1>My Profile 👤</h1>
+
+    <br>
+
+    {% if profile.profile_picture %}
+
+        <img
+            src="{{ profile.profile_picture.url }}"
+            alt="Profile Picture"
+            width="150"
+            height="150"
+        >
+
+        <br><br>
+
+    {% else %}
+
+        <p>No profile picture uploaded.</p>
+
+    {% endif %}
+
+
+    <h2>{{ profile_user.username }}</h2>
+
+    <br>
+
+    <p>
+        👥 <strong>{{ friend_count }}</strong> Friends
+    </p>
+
+    <p>
+        <strong>Username:</strong>
+        {{ profile_user.username }}
+    </p>
+
+    <p>
+        <strong>Email:</strong>
+        {{ profile_user.email|default:"Not provided" }}
+    </p>
+
+    <p>
+        <strong>Date Joined:</strong>
+        {{ profile_user.date_joined|date:"d M Y" }}
+    </p>
+
+    <br>
+
+    <a href="{% url 'edit_profile' %}">
+        <button>
+            Edit Profile
+        </button>
+    </a>
+
+</div>
+
+
+<!-- MY POSTS -->
+
+<div class="card">
+
+    <h2>My Posts 📝</h2>
+
+    <br>
+
+    {% for post in posts %}
+
+        <div class="card">
+
+            <h3>
+                {{ post.user.username }}
+            </h3>
+
+            <small>
+                {{ post.created_at }}
+            </small>
+
+            <br><br>
+
+
+            <!-- POST TEXT -->
+
+            {% if post.content %}
+
+                <p>
+                    {{ post.content }}
+                </p>
+
+            {% endif %}
+
+
+            <!-- POST IMAGE -->
+
+            {% if post.image %}
+
+                <br>
+
+                <img
+                    src="{{ post.image.url }}"
+                    alt="Post image"
+                    width="400"
+                    style="max-width: 100%; height: auto;"
+                >
+
+            {% endif %}
+
+
+            <!-- POST VIDEO -->
+
+            {% if post.video %}
+
+                <br>
+
+                <video
+                    width="500"
+                    controls
+                    style="max-width: 100%;"
+                >
+
+                    <source
+                        src="{{ post.video.url }}"
+                        type="video/mp4"
+                    >
+
+                    Your browser does not support video.
+
+                </video>
+
+            {% endif %}
+
+
+            <!-- EDIT / DELETE -->
+
+            <br><br>
+
+            <a href="{% url 'edit_post' post.id %}">
+                <button>
+                    Edit Post
+                </button>
+            </a>
+
+            <a href="{% url 'delete_post' post.id %}">
+                <button>
+                    Delete Post
+                </button>
+            </a>
+
+        </div>
+
+    {% empty %}
+
+        <p>
+            You haven't created any posts yet.
+        </p>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

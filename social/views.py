@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
-from .models import FriendRequest, Friendship, Post
+from .models import FriendRequest, Friendship, Post, Profile
 
 
 def register_view(request):
@@ -13,30 +13,33 @@ def register_view(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
 
+        print("USERNAME RECEIVED:", repr(username))
+
         if User.objects.filter(username=username).exists():
+
+            print("USERNAME ALREADY EXISTS")
 
             return render(
                 request,
                 "social/register.html",
                 {
-                    "error": "Username already exists"
+                    "error": "Username already exists. Please choose another username."
                 }
             )
 
-        user = User.objects.create_user(
+        print("USERNAME IS NEW")
+
+        User.objects.create_user(
             username=username,
             password=password
         )
 
-        login(request, user)
-
-        return redirect("home")
+        return redirect("login")
 
     return render(
         request,
         "social/register.html"
     )
-
 
 def login_view(request):
 
@@ -83,20 +86,20 @@ def home(request):
 
     friends = []
 
-    friendships = Friendship.objects.filter(
-        user1=request.user
-    )
+    friendships = Friendship.objects.filter(user1=request.user)
 
     for friendship in friendships:
         friends.append(friendship.user2)
 
-    friendships = Friendship.objects.filter(
-        user2=request.user
-    )
+    friendships = Friendship.objects.filter(user2=request.user)
 
     for friendship in friendships:
         friends.append(friendship.user1)
 
+    # Add the logged-in user
+    friends.append(request.user)
+
+    # Show own posts + friends' posts
     posts = Post.objects.filter(
         user__in=friends
     ).order_by("-created_at")
@@ -104,24 +107,48 @@ def home(request):
     return render(
         request,
         "social/home.html",
-        {
-            "posts": posts
-        }
+        {"posts": posts}
     )
-
 
 @login_required
 def users_view(request):
 
-    users = User.objects.exclude(
-        id=request.user.id
-    )
+    search = request.GET.get("search", "")
+
+    if search:
+        users = User.objects.filter(
+            username__icontains=search
+        ).exclude(id=request.user.id)
+    else:
+        users = User.objects.exclude(
+            id=request.user.id
+        )
+
+    friends = []
+
+    friendships = Friendship.objects.filter(user1=request.user)
+
+    for friendship in friendships:
+        friends.append(friendship.user2.id)
+
+    friendships = Friendship.objects.filter(user2=request.user)
+
+    for friendship in friendships:
+        friends.append(friendship.user1.id)
+
+    sent_requests = FriendRequest.objects.filter(
+        sender=request.user,
+        accepted=False
+    ).values_list("receiver_id", flat=True)
 
     return render(
         request,
         "social/friends.html",
         {
-            "users": users
+            "users": users,
+            "friends": friends,
+            "sent_requests": sent_requests,
+            "search": search,
         }
     )
 
@@ -129,16 +156,39 @@ def users_view(request):
 @login_required
 def send_friend_request(request, user_id):
 
-    receiver = User.objects.get(
-        id=user_id
-    )
+    receiver = User.objects.get(id=user_id)
 
-    existing_request = FriendRequest.objects.filter(
-        sender=request.user,
-        receiver=receiver
+    # Don't send request to yourself
+    if receiver == request.user:
+        return redirect("users")
+
+    # Check if already friends
+    already_friends = Friendship.objects.filter(
+        user1=request.user,
+        user2=receiver
+    ).exists() or Friendship.objects.filter(
+        user1=receiver,
+        user2=request.user
     ).exists()
 
-    if not existing_request:
+    if already_friends:
+        return redirect("users")
+
+    # Check if a request already exists in either direction
+    existing_request = FriendRequest.objects.filter(
+        sender=request.user,
+        receiver=receiver,
+        accepted=False
+    ).exists()
+
+    reverse_request = FriendRequest.objects.filter(
+        sender=receiver,
+        receiver=request.user,
+        accepted=False
+    ).exists()
+
+    # Create request only if neither exists
+    if not existing_request and not reverse_request:
 
         FriendRequest.objects.create(
             sender=request.user,
@@ -147,9 +197,9 @@ def send_friend_request(request, user_id):
 
     return redirect("users")
 
+
 @login_required
 def accept_friend_request(request, request_id):
-
     friend_request = FriendRequest.objects.get(
         id=request_id,
         receiver=request.user
@@ -158,12 +208,13 @@ def accept_friend_request(request, request_id):
     friend_request.accepted = True
     friend_request.save()
 
-    Friendship.objects.create(
+    Friendship.objects.get_or_create(
         user1=friend_request.sender,
         user2=friend_request.receiver
     )
 
     return redirect("requests")
+
 
 @login_required
 def friend_requests_view(request):
@@ -180,20 +231,170 @@ def friend_requests_view(request):
             "requests": requests
         }
     )
+# 
 @login_required
 def create_post(request):
 
     if request.method == "POST":
 
         content = request.POST.get("content")
+        image = request.FILES.get("image")
+        video = request.FILES.get("video")
 
-        if content:
+        if content or image or video:
 
             Post.objects.create(
                 user=request.user,
-                content=content
+                content=content,
+                image=image,
+                video=video
             )
 
         return redirect("home")
 
     return redirect("home")
+
+
+@login_required
+def my_friends(request):
+    friends = []
+
+    friendships = Friendship.objects.filter(user1=request.user)
+
+    for friendship in friendships:
+        if friendship.user2 not in friends:
+            friends.append(friendship.user2)
+
+    friendships = Friendship.objects.filter(user2=request.user)
+
+    for friendship in friendships:
+        if friendship.user1 not in friends:
+            friends.append(friendship.user1)
+
+    return render(
+        request,
+        "social/my_friends.html",
+        {"friends": friends}
+    )
+
+@login_required
+def profile_view(request):
+
+    profile, created = Profile.objects.get_or_create(
+        user=request.user
+    )
+
+    friends = []
+
+    friendships = Friendship.objects.filter(
+        user1=request.user
+    )
+
+    for friendship in friendships:
+
+        if friendship.user2 not in friends:
+            friends.append(friendship.user2)
+
+    friendships = Friendship.objects.filter(
+        user2=request.user
+    )
+
+    for friendship in friendships:
+
+        if friendship.user1 not in friends:
+            friends.append(friendship.user1)
+
+    friend_count = len(friends)
+
+    # Get posts created by this user
+    posts = Post.objects.filter(
+        user=request.user
+    ).order_by("-created_at")
+
+    return render(
+        request,
+        "social/profile.html",
+        {
+            "profile_user": request.user,
+            "profile": profile,
+            "friend_count": friend_count,
+            "posts": posts,
+        }
+    )
+
+
+@login_required
+def edit_profile(request):
+
+    profile, created = Profile.objects.get_or_create(
+        user=request.user
+    )
+
+    if request.method == "POST":
+
+        request.user.email = request.POST.get("email")
+        request.user.save()
+
+        if request.FILES.get("profile_picture"):
+            profile.profile_picture = request.FILES["profile_picture"]
+            profile.save()
+
+        return redirect("profile")
+
+    return render(
+        request,
+        "social/edit_profile.html",
+        {
+            "profile_user": request.user,
+            "profile": profile,
+        }
+    )
+
+
+@login_required
+def delete_post(request, post_id):
+
+    post = Post.objects.get(
+        id=post_id,
+        user=request.user
+    )
+
+    post.delete()
+
+    return redirect("home")
+
+@login_required
+def edit_post(request, post_id):
+
+    post = Post.objects.get(
+        id=post_id,
+        user=request.user
+    )
+
+    if request.method == "POST":
+
+        content = request.POST.get("content")
+        image = request.FILES.get("image")
+        video = request.FILES.get("video")
+
+        post.content = content
+
+        # Replace image if a new image is selected
+        if image:
+            post.image = image
+
+        # Replace video if a new video is selected
+        if video:
+            post.video = video
+
+        post.save()
+
+        return redirect("home")
+
+    return render(
+        request,
+        "social/edit_post.html",
+        {
+            "post": post
+        }
+    )

@@ -1,0 +1,48 @@
+{% extends "social/base.html" %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>Edit Profile ✏️</h1>
+
+    <br>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        <label>Email:</label>
+
+        <br><br>
+
+        <input
+            type="email"
+            name="email"
+            value="{{ profile_user.email }}"
+            placeholder="Enter your email"
+        >
+
+        <br><br>
+
+        <label>Profile Picture:</label>
+
+        <br><br>
+
+        <input
+            type="file"
+            name="profile_picture"
+            accept="image/*"
+        >
+
+        <br><br>
+
+        <button type="submit">
+            Save Changes
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

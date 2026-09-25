@@ -4,11 +4,30 @@
 
 <div class="card">
 
-    <h1>Find Friends</h1>
+    <h1>Find Friends 👥</h1>
 
-    <p>Here you can find other users.</p>
+    <p>Find other users and send friend requests.</p>
+
+    <br>
+
+    <!-- Search Users -->
+    <form method="GET">
+
+        <input
+            type="text"
+            name="search"
+            placeholder="Search username..."
+            value="{{ search }}"
+        >
+
+        <button type="submit">
+            Search
+        </button>
+
+    </form>
 
 </div>
+
 
 {% for person in users %}
 
@@ -16,21 +35,38 @@
 
     <h2>{{ person.username }}</h2>
 
-    <p>User ID: {{ person.id }}</p>
+    <br>
 
-    <a href="{% url 'send_friend_request' person.id %}">
-        <button>Add Friend</button>
-    </a>
+    {% if person.id in friends %}
+
+        <p>✅ You are already friends</p>
+
+    {% elif person.id in sent_requests %}
+
+        <p>⏳ Friend request sent</p>
+
+    {% else %}
+
+        <a href="{% url 'send_friend_request' person.id %}">
+            <button>Add Friend</button>
+        </a>
+
+    {% endif %}
 
 </div>
+
 
 {% empty %}
 
 <div class="card">
 
-    <h3>No other users found.</h3>
+    <h3>No users found.</h3>
 
-    <p>Create another account to test the friend request feature.</p>
+    {% if search %}
+        <p>No user found for "{{ search }}".</p>
+    {% else %}
+        <p>Create another account to test the friend system.</p>
+    {% endif %}
 
 </div>
 
