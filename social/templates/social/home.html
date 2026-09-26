@@ -2,7 +2,6 @@
 
 {% block content %}
 
-<!-- CREATE POST -->
 
 <div class="card">
 
@@ -30,7 +29,7 @@
 
         <br><br>
 
-        <!-- PHOTO -->
+
 
         <label
             for="image-upload"
@@ -49,7 +48,7 @@
 
         &nbsp;&nbsp;&nbsp;
 
-        <!-- VIDEO -->
+    
 
         <label
             for="video-upload"
@@ -77,7 +76,7 @@
 </div>
 
 
-<!-- FEED -->
+
 
 <div class="card">
 
@@ -89,7 +88,6 @@
 
         <div class="card">
 
-            <!-- USERNAME -->
 
             <h3>
                 {{ post.user.username }}
@@ -104,8 +102,6 @@
             <br><br>
 
 
-            <!-- TEXT -->
-
             {% if post.content %}
 
                 <p>
@@ -113,9 +109,6 @@
                 </p>
 
             {% endif %}
-
-
-            <!-- PHOTO -->
 
             {% if post.image %}
 
@@ -131,7 +124,7 @@
             {% endif %}
 
 
-            <!-- VIDEO -->
+         
 
             {% if post.video %}
 
@@ -154,8 +147,6 @@
 
             {% endif %}
 
-
-            <!-- EDIT AND DELETE -->
 
             {% if post.user == user %}
 

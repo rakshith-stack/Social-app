@@ -5,150 +5,384 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>MySocial</title>
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <title>Fake Book</title>
 
     <style>
 
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: #f0f2f5;
-            color: #1c1e21;
+            font-family: Arial, Helvetica, sans-serif;
+
+            background: rgba(0, 0, 0, 0.35);
+
+            color: #f5e6e8;
+
+            min-height: 100vh;
         }
 
-        .navbar {
-            height: 60px;
-            background: white;
+
+       
+
+        nav {
+            background: #110308;
+
+            border-bottom: 1px solid #70243d;
+
+            padding: 15px 30px;
+
             display: flex;
+
             align-items: center;
+
             justify-content: space-between;
-            padding: 0 30px;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.15);
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 100;
         }
+
 
         .logo {
             font-size: 25px;
+
             font-weight: bold;
-            color: #1877f2;
-        }
 
-        .nav-right a {
+            color: #f8d7dc;
+
             text-decoration: none;
-            margin-left: 20px;
-            color: #333;
         }
 
+
+        .nav-links {
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .nav-links a {
+            color: #f3dce1;
+
+            text-decoration: none;
+
+            padding: 9px 13px;
+
+            border-radius: 8px;
+
+            transition: 0.2s;
+        }
+
+
+        .nav-links a:hover {
+            background: #5b5859;
+
+            color: white;
+        }
+
+
+        
         .container {
             width: 90%;
-            max-width: 1100px;
+
+            max-width: 900px;
+
             margin: 30px auto;
         }
 
+
         .card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
+            background: #080b0c;
+
+            border: 1px solid #54202f;
+
+            border-radius: 14px;
+
+            padding: 22px;
+
             margin-bottom: 20px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, 0.25);
         }
+
+
+        .card:hover {
+            border-color: #7d3049;
+        }
+
+        
+
+        h1 {
+            color: #fff1f3;
+
+            font-size: 28px;
+        }
+
+
+        h2 {
+            color: #f8dfe3;
+        }
+
+
+        h3 {
+            color: #e8aeb9;
+        }
+
+
+        p {
+            color: #d9c1c6;
+
+            line-height: 1.6;
+        }
+
+
+        small {
+            color: #a88b92;
+        }
+
 
         input,
         textarea {
+
             width: 100%;
+
+            background: #2d2c2c;
+
+            color: #fff1f3;
+
+            border: 1px solid #633044;
+
+            border-radius: 9px;
+
             padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin-bottom: 12px;
+
+            font-size: 15px;
+
+            outline: none;
+
+            transition: 0.2s;
         }
+
+
+        textarea {
+            resize: vertical;
+        }
+
+
+        input:focus,
+        textarea:focus {
+
+            border-color: #c05a73;
+
+            box-shadow:
+                0 0 0 2px rgba(192, 90, 115, 0.15);
+        }
+
+
+    
 
         button {
-            background: #1877f2;
+
+            background: linear-gradient(
+                135deg,
+                #7a1738,
+                #a52b4e
+            );
+
             color: white;
+
             border: none;
-            padding: 10px 18px;
-            border-radius: 7px;
+
+            border-radius: 9px;
+
+            padding: 10px 17px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
             cursor: pointer;
+
+            transition: 0.2s;
         }
 
+
         button:hover {
-            background: #166fe5;
+
+            background: linear-gradient(
+                135deg,
+                #922047,
+                #bd3659
+            );
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 6px 18px rgba(122, 23, 56, 0.35);
+        }
+
+
+        
+
+        a {
+            color: #e7a5b3;
+        }
+
+
+        
+        img {
+
+            border-radius: 10px;
+
+            max-width: 100%;
+        }
+
+
+        
+
+        video {
+
+            border-radius: 10px;
+
+            max-width: 100%;
+
+            background: #000;
+        }
+
+
+        label {
+            color: #e5cdd2;
+        }
+
+
+    
+
+        hr {
+
+            border: none;
+
+            border-top: 1px solid #54202f;
+
+            margin: 20px 0;
+        }
+
+
+        
+
+        @media (max-width: 700px) {
+
+            nav {
+
+                padding: 14px;
+
+                flex-direction: column;
+
+                gap: 12px;
+            }
+
+
+            .nav-links {
+
+                justify-content: center;
+            }
+
+
+            .container {
+
+                width: 94%;
+
+                margin-top: 20px;
+            }
+
+
+            .card {
+
+                padding: 17px;
+            }
+
+
+            h1 {
+
+                font-size: 24px;
+            }
+
         }
 
     </style>
 
 </head>
 
+
 <body>
 
-    <nav class="navbar">
 
-        <div class="logo">
-            MySocial
-        </div>
+   
 
-        <div class="nav-right">
+    <nav>
 
-            {% if user.is_authenticated %}
+        <a href="{% url 'home' %}" class="logo">
+            ✦ Fake 
+        </a>
 
-                <span>
-                    Hello, {{ user.username }}
-                </span>
+
+        {% if user.is_authenticated %}
+
+            <div class="nav-links">
 
                 <a href="{% url 'home' %}">
-                    Home
+                    🏠 Home
                 </a>
+
                 <a href="{% url 'profile' %}">
-                    Profile
+                    👤 Profile
                 </a>
+
                 <a href="{% url 'users' %}">
-                    Find Friends
+                    👥 Search Friends
                 </a>
-                <a href="{% url 'my_friends' %}">
-                    My Friends
-                </a>
+
                 <a href="{% url 'requests' %}">
-                    Friend Requests
+                    📩 Requests
+                </a>
+
+                <a href="{% url 'my_friends' %}">
+                    🤝 My Friends
                 </a>
 
                 <a href="{% url 'logout' %}">
-                    Logout
+                    🚪 Logout
                 </a>
 
-            {% else %}
+            </div>
 
-                <a href="{% url 'login' %}">
-                    Login
-                </a>
-
-                <a href="{% url 'register' %}">
-                    Register
-                </a>
-
-            {% endif %}
-
-        </div>
+        {% endif %}
 
     </nav>
 
 
-    <div class="container">
+
+    
+    <main class="container">
 
         {% block content %}
 
         {% endblock %}
 
-    </div>
+    </main>
+
 
 </body>
 
