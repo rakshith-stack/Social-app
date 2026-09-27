@@ -1,0 +1,96 @@
+{% extends "social/base.html" %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>Chat with {{ other_user.username }} 💬</h1>
+
+    <br>
+
+    <div class="chat-box">
+
+        {% for message in messages %}
+
+            {% if message.sender.id == current_user.id %}
+
+                <!-- Message sent by me -->
+
+                <div class="message my-message">
+
+                    <strong>You</strong>
+
+                    <p>{{ message.content }}</p>
+
+                    <small>
+                        {{ message.created_at|date:"d M Y, h:i A" }}
+                    </small>
+
+                    <br><br>
+
+                    <a href="{% url 'delete_message' message.id %}">
+                        <button type="button">
+                            🗑️ Delete
+                        </button>
+                    </a>
+
+                </div>
+
+            {% else %}
+
+                <!-- Message sent by friend -->
+
+                <div class="message friend-message">
+
+                    <strong>{{ message.sender.username }}</strong>
+
+                    <p>{{ message.content }}</p>
+
+                    <small>
+                        {{ message.created_at|date:"d M Y, h:i A" }}
+                    </small>
+
+                </div>
+
+            {% endif %}
+
+        {% empty %}
+
+            <p>No messages yet. Start the conversation!</p>
+
+        {% endfor %}
+
+    </div>
+
+    <br>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <textarea
+            name="content"
+            rows="3"
+            placeholder="Type a message..."
+            required
+        ></textarea>
+
+        <br><br>
+
+        <button type="submit">
+            Send Message
+        </button>
+
+    </form>
+
+    <br>
+
+    <a href="{% url 'my_friends' %}">
+        <button type="button">
+            ← Back to Friends
+        </button>
+    </a>
+
+</div>
+
+{% endblock %}

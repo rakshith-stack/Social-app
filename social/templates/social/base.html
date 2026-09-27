@@ -321,6 +321,57 @@
 
         }
 
+
+            .chat-box {
+                max-height: 500px;
+                overflow-y: auto;
+                padding: 15px;
+                border: 1px solid #54202f;
+                background: #1b0b10;
+            }
+
+            .message {
+                padding: 12px;
+                margin-bottom: 12px;
+                max-width: 70%;
+            }
+
+            .my-message {
+                margin-left: auto;
+                background: #7a1738;
+                text-align: right;
+            }
+
+            .friend-message {
+                margin-right: auto;
+                background: #29121a;
+                border: 1px solid #54202f;
+            }
+
+            .message p {
+                margin: 5px 0;
+            }
+
+            .message small {
+                opacity: 0.7;
+            }
+
+
+
+            .nav-notification {
+                position: relative;
+            }
+
+            .notification-dot {
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                background: #ff3b5c;
+                border-radius: 50%;
+                margin-left: 5px;
+                vertical-align: top;
+            }
+
     </style>
 
 </head>
@@ -358,8 +409,13 @@
                     📩 Requests
                 </a>
 
-                <a href="{% url 'my_friends' %}">
-                    🤝 My Friends
+                <a href="{% url 'my_friends' %}" class="nav-notification">
+                    My Friends
+
+                    {% if unread_messages %}
+                        <span class="notification-dot"></span>
+                    {% endif %}
+
                 </a>
 
                 <a href="{% url 'logout' %}">

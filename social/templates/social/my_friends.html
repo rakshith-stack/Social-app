@@ -3,15 +3,34 @@
 {% block content %}
 
 <div class="card">
+
     <h1>My Friends 👥</h1>
 
     <br>
 
-    {% for friend in friends %}
+    {% for item in friend_data %}
 
         <div class="card">
-            <h2>{{ friend.username }}</h2>
-            <p>You are friends with {{ friend.username }}.</p>
+
+            <h2>{{ item.friend.username }}</h2>
+
+            {% if item.latest_message %}
+                <small>
+                    Last message:
+                    {{ item.latest_message.created_at|date:"d M Y, h:i A" }}
+                </small>
+            {% else %}
+                <small>No messages yet</small>
+            {% endif %}
+
+            <br><br>
+
+            <a href="{% url 'chat' item.friend.id %}">
+                <button type="button">
+                    💬 Message
+                </button>
+            </a>
+
         </div>
 
     {% empty %}
@@ -19,6 +38,7 @@
         <p>You don't have any friends yet.</p>
 
     {% endfor %}
+
 </div>
 
 {% endblock %}

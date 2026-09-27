@@ -17,4 +17,6 @@ urlpatterns = [
     path("my-friends/", views.my_friends, name="my_friends"),
     path("profile/", views.profile_view, name="profile"),
     path("edit-profile/", views.edit_profile, name="edit_profile"),
+    path("chat/<int:user_id>/", views.chat_view, name="chat"),
+    path("delete-message/<int:message_id>/",views.delete_message,name="delete_message"),
 ]

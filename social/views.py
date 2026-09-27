@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
+from django.db import models
 
-from .models import FriendRequest, Friendship, Post, Profile
+from .models import FriendRequest, Friendship, Post, Profile,  Message
 
 
 def register_view(request):
@@ -257,24 +259,64 @@ def create_post(request):
 
 @login_required
 def my_friends(request):
+
     friends = []
 
-    friendships = Friendship.objects.filter(user1=request.user)
+    friendships = Friendship.objects.filter(
+        user1=request.user
+    )
 
     for friendship in friendships:
         if friendship.user2 not in friends:
             friends.append(friendship.user2)
 
-    friendships = Friendship.objects.filter(user2=request.user)
+    friendships = Friendship.objects.filter(
+        user2=request.user
+    )
 
     for friendship in friendships:
         if friendship.user1 not in friends:
             friends.append(friendship.user1)
 
+    # Get latest message for every friend
+    friend_data = []
+
+    for friend in friends:
+
+        latest_message = Message.objects.filter(
+            sender__in=[request.user, friend],
+            receiver__in=[request.user, friend]
+        ).order_by("-created_at").first()
+
+        friend_data.append({
+            "friend": friend,
+            "latest_message": latest_message
+        })
+
+    # Friends with messages come first.
+    # Friends without messages come after them.
+    friend_data.sort(
+        key=lambda x: (
+            x["latest_message"] is not None,
+            x["latest_message"].created_at
+            if x["latest_message"]
+            else datetime.min
+        ),
+        reverse=True
+    )
+
+    unread_messages = Message.objects.filter(
+        receiver=request.user,
+        is_read=False
+    ).exists()
+
     return render(
         request,
         "social/my_friends.html",
-        {"friends": friends}
+        {
+            "friend_data": friend_data,
+            "unread_messages": unread_messages,
+        }
     )
 
 @login_required
@@ -398,3 +440,69 @@ def edit_post(request, post_id):
             "post": post
         }
     )
+
+
+@login_required
+def chat_view(request, user_id):
+
+    other_user = User.objects.get(id=user_id)
+
+    are_friends = Friendship.objects.filter(
+        user1=request.user,
+        user2=other_user
+    ).exists() or Friendship.objects.filter(
+        user1=other_user,
+        user2=request.user
+    ).exists()
+
+    if not are_friends:
+        return redirect("my_friends")
+
+    # Mark messages from this friend as read
+    Message.objects.filter(
+        sender=other_user,
+        receiver=request.user,
+        is_read=False
+    ).update(is_read=True)
+
+    messages = Message.objects.filter(
+        models.Q(sender=request.user, receiver=other_user) |
+        models.Q(sender=other_user, receiver=request.user)
+    ).order_by("created_at")
+
+    if request.method == "POST":
+
+        content = request.POST.get("content")
+
+        if content:
+            Message.objects.create(
+                sender=request.user,
+                receiver=other_user,
+                content=content
+            )
+
+        return redirect("chat", user_id=other_user.id)
+
+    return render(
+    request,
+    "social/chat.html",
+    {
+        "other_user": other_user,
+        "messages": messages,
+        "current_user": request.user,
+    }
+)
+
+@login_required
+def delete_message(request, message_id):
+
+    message = Message.objects.get(
+        id=message_id,
+        sender=request.user
+    )
+
+    other_user = message.receiver
+
+    message.delete()
+
+    return redirect("chat", user_id=other_user.id)
