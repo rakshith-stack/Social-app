@@ -15,11 +15,7 @@ def register_view(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
 
-        print("USERNAME RECEIVED:", repr(username))
-
         if User.objects.filter(username=username).exists():
-
-            print("USERNAME ALREADY EXISTS")
 
             return render(
                 request,
@@ -29,19 +25,24 @@ def register_view(request):
                 }
             )
 
-        print("USERNAME IS NEW")
-
         User.objects.create_user(
             username=username,
             password=password
         )
 
-        return redirect("login")
+        return render(
+            request,
+            "social/register.html",
+            {
+                "success": "Registration successful! You can now login."
+            }
+        )
 
     return render(
         request,
         "social/register.html"
     )
+
 
 def login_view(request):
 
@@ -98,10 +99,9 @@ def home(request):
     for friendship in friendships:
         friends.append(friendship.user1)
 
-    # Add the logged-in user
+    
     friends.append(request.user)
 
-    # Show own posts + friends' posts
     posts = Post.objects.filter(
         user__in=friends
     ).order_by("-created_at")
@@ -160,11 +160,11 @@ def send_friend_request(request, user_id):
 
     receiver = User.objects.get(id=user_id)
 
-    # Don't send request to yourself
+   
     if receiver == request.user:
         return redirect("users")
 
-    # Check if already friends
+    
     already_friends = Friendship.objects.filter(
         user1=request.user,
         user2=receiver
@@ -176,7 +176,7 @@ def send_friend_request(request, user_id):
     if already_friends:
         return redirect("users")
 
-    # Check if a request already exists in either direction
+    
     existing_request = FriendRequest.objects.filter(
         sender=request.user,
         receiver=receiver,
@@ -189,7 +189,7 @@ def send_friend_request(request, user_id):
         accepted=False
     ).exists()
 
-    # Create request only if neither exists
+     
     if not existing_request and not reverse_request:
 
         FriendRequest.objects.create(
@@ -278,7 +278,6 @@ def my_friends(request):
         if friendship.user1 not in friends:
             friends.append(friendship.user1)
 
-    # Get latest message for every friend
     friend_data = []
 
     for friend in friends:
@@ -293,8 +292,7 @@ def my_friends(request):
             "latest_message": latest_message
         })
 
-    # Friends with messages come first.
-    # Friends without messages come after them.
+    
     friend_data.sort(
         key=lambda x: (
             x["latest_message"] is not None,
@@ -348,7 +346,7 @@ def profile_view(request):
 
     friend_count = len(friends)
 
-    # Get posts created by this user
+    
     posts = Post.objects.filter(
         user=request.user
     ).order_by("-created_at")
@@ -421,11 +419,11 @@ def edit_post(request, post_id):
 
         post.content = content
 
-        # Replace image if a new image is selected
+        
         if image:
             post.image = image
 
-        # Replace video if a new video is selected
+        
         if video:
             post.video = video
 
@@ -458,7 +456,7 @@ def chat_view(request, user_id):
     if not are_friends:
         return redirect("my_friends")
 
-    # Mark messages from this friend as read
+   
     Message.objects.filter(
         sender=other_user,
         receiver=request.user,
