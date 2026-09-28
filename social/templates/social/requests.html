@@ -12,19 +12,21 @@
 
         <div class="card">
 
-            <h3>
+            <h2>
                 {{ friend_request.sender.username }}
-            </h3>
-
-            <p>
-                wants to be your friend.
-            </p>
+            </h2>
 
             <br>
 
             <a href="{% url 'accept_request' friend_request.id %}">
-                <button>
+                <button type="button">
                     Accept
+                </button>
+            </a>
+
+            <a href="{% url 'reject_request' friend_request.id %}">
+                <button type="button">
+                    Reject
                 </button>
             </a>
 
@@ -32,9 +34,7 @@
 
     {% empty %}
 
-        <p>
-            You don't have any friend requests.
-        </p>
+        <p>No friend requests.</p>
 
     {% endfor %}
 

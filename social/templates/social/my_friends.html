@@ -31,6 +31,10 @@
                 </button>
             </a>
 
+            <a href="{% url 'unfriend' item.friend.id %}">
+                    <button type="button">❌ Unfriend</button>
+            </a>
+
         </div>
 
     {% empty %}

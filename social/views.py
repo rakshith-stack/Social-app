@@ -219,6 +219,20 @@ def accept_friend_request(request, request_id):
 
 
 @login_required
+def reject_friend_request(request, request_id):
+
+    friend_request = FriendRequest.objects.get(
+        id=request_id,
+        receiver=request.user,
+        accepted=False
+    )
+
+    friend_request.delete()
+
+    return redirect("requests")
+
+
+@login_required
 def friend_requests_view(request):
 
     requests = FriendRequest.objects.filter(
@@ -316,6 +330,24 @@ def my_friends(request):
             "unread_messages": unread_messages,
         }
     )
+
+
+@login_required
+def unfriend(request, user_id):
+
+    friend = User.objects.get(id=user_id)
+
+    Friendship.objects.filter(
+        user1=request.user,
+        user2=friend
+    ).delete()
+
+    Friendship.objects.filter(
+        user1=friend,
+        user2=request.user
+    ).delete()
+
+    return redirect("my_friends")
 
 @login_required
 def profile_view(request):
